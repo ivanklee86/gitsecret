@@ -13,7 +13,7 @@ jobs:
           command: pipenv install --dev
       - run:
           name: Run tests.
-          command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret tests
+          command: pipenv run export PYTHONPATH=.;py.test --junitxml=pytest/results.xml --cov=gitsecret tests
       - run:
           name: Lint code.
           command: pipenv run pylint gitsecret -f parseable >> pylint.log
