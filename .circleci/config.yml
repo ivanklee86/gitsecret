@@ -13,7 +13,7 @@ jobs:
           command: pipenv install --dev
       - run:
           name: Install package
-          command: pipenv run setup.py
+          command: pipenv install -e .
       - run:
           name: Run tests.
           command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret tests
