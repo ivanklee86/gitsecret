@@ -7,6 +7,7 @@ def readme():
     with open('README.md') as file:
         return file.read()
 
+
 setup(
     name='gitsecret',
     version='0.0.1',
@@ -27,4 +28,3 @@ setup(
         "License :: OSI Approved :: MIT License",
     ]
 )
-

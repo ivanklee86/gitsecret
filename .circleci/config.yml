@@ -12,8 +12,11 @@ jobs:
           name: Install dependencies.
           command: pipenv install --dev
       - run:
+          name: Install package
+          command: pipenv install -e .
+      - run:
           name: Run tests.
-          command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret tests/unit_tests
+          command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret tests
       - run:
           name: Lint code.
           command: pipenv run pylint gitsecret -f parseable >> pylint.log
@@ -26,9 +29,9 @@ jobs:
           path: pylint.log
       - store_artifacts:
           path: mypy.log
-#      - run:
-#          name: Send code coverage to Coveralls
-#          command: pipenv run coveralls
+      - run:
+          name: Send code coverage to Coveralls
+          command: pipenv run coveralls
 
 workflows:
   version: 2
