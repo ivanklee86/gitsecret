@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+gitpython = "*"
 
 [dev-packages]
 # Pytest
@@ -14,6 +15,8 @@ pytest-html  = "*"
 pytest-runner  = "*"
 pytest-rerunfailures  = "*"
 pytest-xdist = "*"
+pytest-mock = "*"
+factory-boy = "*"
 coveralls = "*"
 # Linting
 mypy = "*"
