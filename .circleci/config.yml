@@ -16,7 +16,7 @@ jobs:
           command: pipenv install -e .
       - run:
           name: Run tests.
-          command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret tests/unit
+          command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret ./tests/unit
       - run:
           name: Lint code.
           command: pipenv run pylint gitsecret -f parseable >> pylint.log
