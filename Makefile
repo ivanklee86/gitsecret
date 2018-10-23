@@ -22,7 +22,7 @@ lint:
 
 pytest:
 	export PYTHONPATH=${ROOT_DIR}: $$PYTHONPATH && \
-	py.test --cov ${PROJECT_NAME}
+	py.test -n 4 --cov ${PROJECT_NAME}
 
 #-----------------------------------------------------------------------
 # Distribution

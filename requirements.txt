@@ -1,2 +1,4 @@
 -i https://pypi.org/simple
-
+gitdb2==2.0.5
+gitpython==2.1.11
+smmap2==2.0.5
