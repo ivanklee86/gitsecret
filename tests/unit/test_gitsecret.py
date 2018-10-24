@@ -49,3 +49,31 @@ def test_gitsecret_tell(gen_gitsecret, mocker):
 
     assert gitsecret.subprocess.run.assert_called_once
     assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "tell", "test@test.com"]
+
+
+def test_gitsecret_tell_noemail(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "gpg: keybox '/Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/pubring.kbx' created\ngpg: /Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/trustdb.gpg: trustdb created\ndone. ivanklee86@gmail.com added as someone who know(s) the secret.\ncleaning up...",
+        'returncode': 0
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    gen_gitsecret.tell()
+
+    assert gitsecret.subprocess.run.assert_called_once
+    assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "tell", "-m"]
+
+
+def test_gitsecret_tell_path(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "gpg: keybox '/Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/pubring.kbx' created\ngpg: /Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/trustdb.gpg: trustdb created\ndone. ivanklee86@gmail.com added as someone who know(s) the secret.\ncleaning up...",
+        'returncode': 0
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    gen_gitsecret.tell(gpg_path="/random/path")
+
+    assert gitsecret.subprocess.run.assert_called_once
+    assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "tell", "-m", "-d", "/random/path"]
