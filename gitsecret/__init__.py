@@ -1,7 +1,7 @@
 import re
 import shlex
 import subprocess
-from typing import Optional
+from typing import Optional, Tuple
 import git
 
 
@@ -17,22 +17,41 @@ class GitSecret():
         # Create gitpython.Repo object to ensure file is actually a repo.
         self.git_repo = git.Repo(self.repo_path)
 
+    def _command_and_parse(self,
+                           command: list,
+                           regex: Optional[str] = None) -> Tuple[subprocess.CompletedProcess, list]:
+        """
+        A (inflexible, implementation-focused) centralized method to run a method and optionally applies a regex to the
+        stdout.
+        :param command: Command to run (just like in the terminal, to be parsed in method)!
+        :param regex: Regex string. Optional.
+        :param location: Location to run command.  Optional
+        :return:
+        """
+        # _Set up for method_
+        search_result: list = []
+
+        # _Run command and parse_
+        output = subprocess.run(args=command, capture_output=True, cwd=self.repo_path)
+
+        if regex and output.returncode == 0:
+            search_result = re.findall(regex, output.stdout.decode("utf-8"))
+
+        if output.returncode != 0:
+            raise GitSecretException("Error running git secret command.  stdout: %s; stderr: %s" %
+                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+
+        return output, search_result
+
     def create(self) -> None:
         init_command = shlex.split("git secret init")
-        output = subprocess.run(args=init_command, capture_output=True, cwd=self.repo_path)
-        search_result: list = None
-
-        if output.returncode == 0:
-            search_result = re.findall(r" created.\ncleaning up...\n$", output.stdout.decode("utf-8"))
-
-        if not search_result or output.returncode > 0:
-            raise GitSecretException("Error initializing gitsecret.  stdout: %s; stderr: %s" %
-                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+        init_regex = r" created.\ncleaning up...\n$"
+        self._command_and_parse(init_command, init_regex)
 
     def tell(self, email: Optional[str] = None,
              gpg_path: Optional[str] = None) -> None:
         tell_command = shlex.split("git secret tell")
-        search_result: list = None
+        tell_regex = r" added as someone who know\(s\) the secret."
 
         if email:
             tell_command.append(email)
@@ -42,14 +61,7 @@ class GitSecret():
         if gpg_path:
             tell_command.extend(["-d", gpg_path])
 
-        output = subprocess.run(args=tell_command, capture_output=True, cwd=self.repo_path)
-
-        if output.returncode == 0:
-            search_result = re.findall(r" added as someone who know\(s\) the secret.", output.stdout.decode("utf-8"))
-
-        if not search_result or output.returncode not in [0, 2]:
-            raise GitSecretException("Error adding user.  stdout: %s; stderr: %s" %
-                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+        self._command_and_parse(tell_command, tell_regex)
 
     def whoknows(self) -> list:
         whoknows_command = shlex.split("git secret whoknows")
@@ -67,15 +79,8 @@ class GitSecret():
     def killperson(self, email: str) -> None:
         killperson_command = shlex.split("git secret killperson")
         killperson_command.append(email)
-        confirmation: list = []
+        killperson_regex = r"do not have an access to the repository."
 
-        output = subprocess.run(args=killperson_command, capture_output=True, cwd=self.repo_path)
-
-        if output.returncode == 0:
-            confirmation = re.findall(r"do not have an access to the repository.", output.stdout.decode("utf-8"))
-
-        if not confirmation or output.returncode > 0:
-            raise GitSecretException("Error revoking user permissions.  stdout: %s; stderr: %s" %
-                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+        self._command_and_parse(killperson_command, killperson_regex)
 
         # Add in re-hiding here.
