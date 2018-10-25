@@ -65,21 +65,6 @@ def test_gitsecret_tell_noemail(gen_gitsecret, mocker):
     assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "tell", "-m"]
 
 
-def test_gitsecret_tell_nonstandard_err(gen_gitsecret, mocker):
-    shell_cmd = FakeCompletedProcess(**{
-        'stdout': "cleaning up...",
-        'stderr': "gpg: keybox '/Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/pubring.kbx' created\ngpg: /Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/trustdb.gpg: trustdb created",
-        'returncode': 2
-    })
-
-    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
-
-    gen_gitsecret.tell(gpg_path="/random/path")
-
-    assert gitsecret.subprocess.run.assert_called_once
-    assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "tell", "-m", "-d", "/random/path"]
-
-
 def test_gitsecret_tell_path(gen_gitsecret, mocker):
     shell_cmd = FakeCompletedProcess(**{
         'stdout': "gpg: keybox '/Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/pubring.kbx' created\ngpg: /Users/ivanlee/repos/sandbox/box2/.gitsecret/keys/trustdb.gpg: trustdb created\ndone. ivanklee86@gmail.com added as someone who know(s) the secret.\ncleaning up...",
@@ -105,3 +90,63 @@ def test_gitsecret_tell_exception(gen_gitsecret, mocker):
 
     with pytest.raises(GitSecretException):
         gen_gitsecret.tell(gpg_path="/random/path")
+
+
+def test_gitsecret_whoknows(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "test1@gmail.com\n",
+        'returncode': 0
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    assert gen_gitsecret.whoknows() == ["test1@gmail.com"]
+
+
+def test_gitsecret_whoknows_multi(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "test1@gmail.com\ntest2@gmail.com",
+        'returncode': 0
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    assert gen_gitsecret.whoknows() == ["test1@gmail.com", "test2@gmail.com"]
+
+
+def test_gitsecret_whoknows_exception(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "Not a repo",
+        'returncode': 1
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    with pytest.raises(GitSecretException):
+        gen_gitsecret.whoknows()
+
+
+def test_gitsecret_killperson(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "removed keys.\nnow [ivanklee86@gmail.com] do not have an access to the repository.\nmake sure to hide the existing secrets again\n",
+        'returncode': 0
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    gen_gitsecret.killperson(email="test@test.com")
+    assert gitsecret.subprocess.run.assert_called_once
+    assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "killperson", "test@test.com"]
+
+
+def test_gitsecret_killperson_exception(gen_gitsecret, mocker):
+    shell_cmd = FakeCompletedProcess(**{
+        'stdout': "None",
+        'stderr': 'gpg: key "ivanklee86@gmail.com" not found: Not found\ngpg: ivanklee86@gmail.com: delete key failed: Not found\n',
+        'returncode': 2
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=shell_cmd)
+
+    with pytest.raises(GitSecretException):
+        gen_gitsecret.killperson(email="test@test.com")
