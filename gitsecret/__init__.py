@@ -43,6 +43,19 @@ class GitSecret():
 
         return output, search_result
 
+    def _command_and_split(self,
+                           command: list):
+        output = subprocess.run(args=command, capture_output=True, cwd=self.repo_path)
+        parsed_list: list = []
+
+        if output.returncode == 0:
+            parsed_list = [n for n in output.stdout.decode("utf-8").split("\n") if n]
+        else:
+            raise GitSecretException("Error running command.  stdout: %s; stderr: %s" %
+                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+
+        return parsed_list
+
     def create(self) -> None:
         init_command = shlex.split("git secret init")
         init_regex = r" created.\ncleaning up...\n$"
@@ -65,16 +78,8 @@ class GitSecret():
 
     def whoknows(self) -> list:
         whoknows_command = shlex.split("git secret whoknows")
-        output = subprocess.run(args=whoknows_command, capture_output=True, cwd=self.repo_path)
-        users: list = []
 
-        if output.returncode == 0:
-            users = [n for n in output.stdout.decode("utf-8").split("\n") if n]
-        else:
-            raise GitSecretException("Error getting list of user with access to secrets.  stdout: %s; stderr: %s" %
-                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
-
-        return users
+        return self._command_and_split(whoknows_command)
 
     def killperson(self, email: str) -> None:
         killperson_command = shlex.split("git secret killperson")
