@@ -21,3 +21,5 @@ def test_gitsecret_invalid_repo(gen_gitsecret):
 def test_gitsecret(gen_gitsecret):
     gitsecret = gen_gitsecret
     gitsecret.create()
+    gitsecret.tell()
+    print("Hello!")
