@@ -90,17 +90,23 @@ class GitSecret():
 
         # Todo: Add in re-hiding here.
 
-    def add(self, filename: str) -> None:
+    def add(self, filename: str, autoadd: bool = False) -> None:
         istracked_command = shlex.split("git ls-files")
-        files = self._command_and_split(istracked_command)
-        file_check = [n for n in files if filename in files]
-
-        if file_check:
-            raise GitSecretException("File isn't ignored via .gitignore and cannot be added to git secret!")
 
         add_command = shlex.split("git secret add")
-        add_command.append(filename)
         add_regex = r" item(s) added."
+
+        if not autoadd:
+            files = self._command_and_split(istracked_command)
+            file_check = [n for n in files if filename in files]
+
+            if file_check:
+                raise GitSecretException("File isn't ignored via .gitignore and cannot be added to git secret!")
+        else:
+            add_command.append("-i")
+
+        add_command.append(filename)
+
         self._command_and_parse(add_command, add_regex)
 
     def hide(self) -> None:

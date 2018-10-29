@@ -1,4 +1,5 @@
 import pytest
+import gitsecret
 from gitsecret import GitSecretException
 from tests.utilities.factories import FakeCompletedProcess
 from tests.utilities.fixtures import gen_gitsecret  # noqa: F401
@@ -31,6 +32,21 @@ def test_gitsecret_add(gen_gitsecret, mocker):  # noqa: F811
     mocker.patch('gitsecret.subprocess.run', return_value=git_secret_add_output)
 
     gen_gitsecret.add("hello.txt")
+    assert gitsecret.subprocess.run.assert_called_once
+    assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "add", "hello.txt"]
+
+
+def test_gitsecret_add_autoadd(gen_gitsecret, mocker):  # noqa: F811
+    git_secret_add_output = FakeCompletedProcess(**{
+        'stdout': "1 item(s) added.\n",
+        'returncode': 0
+    })
+
+    mocker.patch('gitsecret.subprocess.run', return_value=git_secret_add_output)
+
+    gen_gitsecret.add("hello.txt", autoadd=True)
+    assert gitsecret.subprocess.run.assert_called_once
+    assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "add", "-i", "hello.txt"]
 
 
 def test_gitsecret_add_exception(gen_gitsecret, mocker):  # noqa: F811
