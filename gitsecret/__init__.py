@@ -88,4 +88,4 @@ class GitSecret():
 
         self._command_and_parse(killperson_command, killperson_regex)
 
-        # Add in re-hiding here.
+        # Todo: Add in re-hiding here.
