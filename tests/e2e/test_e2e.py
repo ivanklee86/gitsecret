@@ -49,3 +49,4 @@ def test_gitsecret_files(gen_gitsecret):
     with open(os.path.join(PATH, ".gitignore"), "a") as test_file:
         test_file.write("hello.txt")
     gitsecret.add("hello.txt")
+    gitsecret.hide()

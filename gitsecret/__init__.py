@@ -102,3 +102,9 @@ class GitSecret():
         add_command.append(filename)
         add_regex = r" item(s) added."
         self._command_and_parse(add_command, add_regex)
+
+    def hide(self) -> None:
+        hide_command = shlex.split("git secret hide")
+        hide_regex = r"done. all [0-1]+ files are hidden."
+
+        self._command_and_parse(hide_command, hide_regex)
