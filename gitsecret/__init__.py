@@ -109,8 +109,14 @@ class GitSecret():
 
         self._command_and_parse(add_command, add_regex)
 
-    def hide(self) -> None:
+    def hide(self, clean_encrypted: bool = False, clean_unencrypted: bool = False) -> None:
         hide_command = shlex.split("git secret hide")
         hide_regex = r"done. all [0-1]+ files are hidden."
+
+        if clean_encrypted:
+            hide_command.append("-c")
+
+        if clean_unencrypted:
+            hide_command.append("-d")
 
         self._command_and_parse(hide_command, hide_regex)
