@@ -37,3 +37,15 @@ def test_gitsecret_user_management(gen_gitsecret):
     gitsecret.tell()
     assert len(gitsecret.whoknows()) == 1
     gitsecret.killperson(gitsecret.whoknows()[0])
+
+
+def test_gitsecret_files(gen_gitsecret):
+    gitsecret = gen_gitsecret
+    gitsecret.create()
+    gitsecret.tell()
+    assert len(gitsecret.whoknows()) == 1
+    with open(os.path.join(PATH, "hello.txt"), "w+") as test_file:
+        test_file.write("Hello!")
+    with open(os.path.join(PATH, ".gitignore"), "a") as test_file:
+        test_file.write("hello.txt")
+    gitsecret.add("hello.txt")
