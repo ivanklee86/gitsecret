@@ -10,7 +10,7 @@ def readme():
 
 setup(
     name='gitsecret',
-    version='0.0.1',
+    version='0.1.0',
     author='Ivan Lee',
     author_email='ivanklee86@gmail.com',
     description='Python wrapper for git-secret.',
