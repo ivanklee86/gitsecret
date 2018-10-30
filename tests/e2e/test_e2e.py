@@ -52,4 +52,7 @@ def test_gitsecret_files(gen_gitsecret):
     gitsecret.hide()
     gitsecret.reveal("test")
     # gitsecret.remove("hello.txt")
+    with open(os.path.join(PATH, "hello.txt"), "a") as test_file:
+        test_file.write("Hello again!")
+    assert "Hello again!" in gitsecret.changes("test")
     assert len(gitsecret.clean()) == 1

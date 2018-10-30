@@ -1,7 +1,7 @@
 import re
 import shlex
 import subprocess
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 import git
 
 
@@ -18,7 +18,7 @@ class GitSecret():
         self.git_repo = git.Repo(self.repo_path)
 
     def _command_and_parse(self,
-                           command: list,
+                           command: list,  # pylint: disable=E0601
                            regex: Optional[str] = None) -> Tuple[subprocess.CompletedProcess, list]:
         """
         A (inflexible, implementation-focused) centralized method to run a method and optionally applies a regex to the
@@ -144,7 +144,31 @@ class GitSecret():
 
         self._command_and_parse(remove_command, remove_regex)
 
-    def clean(self) -> list:
+    def clean(self) -> Optional[List]:
         clean_command = shlex.split("git secret clean -v")
 
         return self._command_and_split(clean_command)[1:]
+
+    def list(self) -> Optional[List]:
+        list_command = shlex.split("git secret list")
+
+        return self._command_and_split(list_command)[:]
+
+    def changes(self, password: str, file_path: Optional[str] = None, gpg_path: Optional[str] = None) -> str:
+        changes_command = shlex.split("git secret changes")
+
+        if gpg_path:
+            changes_command.extend(["-d", gpg_path])
+
+        changes_command.extend(["-p", password])
+
+        if file_path:
+            changes_command.append(file_path)
+
+        output = subprocess.run(args=changes_command, capture_output=True, cwd=self.repo_path)
+
+        if output.returncode != 0:
+            raise GitSecretException("Error running git secret command.  stdout: %s; stderr: %s" %
+                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+
+        return str(output.stdout.decode("utf-8"))
