@@ -13,7 +13,7 @@ def test_gitsecret_remove(gen_gitsecret, mocker):  # noqa: F811
 
     mocker.patch('gitsecret.subprocess.run', return_value=shell_command)
 
-    gen_gitsecret.remove(filename="hello.txt")
+    gen_gitsecret.remove(file_path="hello.txt")
 
     assert gitsecret.subprocess.run.assert_called_once
     assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "remove", "hello.txt"]
@@ -27,7 +27,7 @@ def test_gitsecret_reveal_overwrite(gen_gitsecret, mocker):  # noqa: F811
 
     mocker.patch('gitsecret.subprocess.run', return_value=shell_command)
 
-    gen_gitsecret.remove(filename="hello.txt",
+    gen_gitsecret.remove(file_path="hello.txt",
                          delete_existing=True)
 
     assert gitsecret.subprocess.run.assert_called_once
@@ -44,4 +44,4 @@ def test_gitsecret_reveal_exception(gen_gitsecret, mocker):  # noqa: F811
     mocker.patch('gitsecret.subprocess.run', return_value=shell_command)
 
     with pytest.raises(GitSecretException):
-        gen_gitsecret.remove(filename="hello.txt")
+        gen_gitsecret.remove(file_path="hello.txt")
