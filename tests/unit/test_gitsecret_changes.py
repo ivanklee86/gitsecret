@@ -65,7 +65,7 @@ def test_gitsecret_changes_all(gen_gitsecret, mocker):  # noqa: F811
     assert gitsecret.subprocess.run.call_args[1]['args'] == ["git", "secret", "changes", "-d", "/path/to/key", "-p", "test", "/path/to/file"]
 
 
-def test_gitsecret_list_exception(gen_gitsecret, mocker):  # noqa: F811
+def test_gitsecret_changes_exception(gen_gitsecret, mocker):  # noqa: F811
     shell_command = FakeCompletedProcess(**{
         'stdout': "None",
         'stderr': "git-secret: abort: /Users/ivanlee/repos/sandbox/box5/.gitsecret/paths/mapping.cfg is missing",
@@ -75,4 +75,4 @@ def test_gitsecret_list_exception(gen_gitsecret, mocker):  # noqa: F811
     mocker.patch('gitsecret.subprocess.run', return_value=shell_command)
 
     with pytest.raises(GitSecretException):
-        gen_gitsecret.list()
+        gen_gitsecret.changes("test")
