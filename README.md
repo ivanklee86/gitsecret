@@ -4,6 +4,8 @@
 
 Python wrapper for [git-secret](http://git-secret.io/). 🔐🔐🔐
 
+Check out the [documentation](https://ivanklee86.github.io/gitsecret/).
+
 ## Pre-requisites
 
 ### Install git secret
@@ -17,8 +19,6 @@ gpg --full-generate-key
 ```
 
 ## Using Git Secret
-
-For full API, check out the documentation.
 
 ### Initialization
 ```python

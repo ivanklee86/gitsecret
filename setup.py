@@ -1,9 +1,9 @@
-"""Setup file for UnleashClient"""
+"""Setup file for GitSecret"""
 from setuptools import setup, find_packages
 
 
 def readme():
-    """Include README.rst content in PyPi build information"""
+    """Include README.md content in PyPi build information"""
     with open('README.md') as file:
         return file.read()
 
@@ -25,6 +25,9 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
+        "Topic :: Software Development :: Version Control :: Git".
+        "Topic :: Security",
+        "Topic :: Security :: Cryptography",
         "License :: OSI Approved :: MIT License",
     ]
 )
