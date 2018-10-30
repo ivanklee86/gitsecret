@@ -43,6 +43,19 @@ class GitSecret():
 
         return output, search_result
 
+    def _command_and_split(self,
+                           command: list):
+        output = subprocess.run(args=command, capture_output=True, cwd=self.repo_path)
+        parsed_list: list = []
+
+        if output.returncode == 0:
+            parsed_list = [n for n in output.stdout.decode("utf-8").split("\n") if n]
+        else:
+            raise GitSecretException("Error running command.  stdout: %s; stderr: %s" %
+                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
+
+        return parsed_list
+
     def create(self) -> None:
         init_command = shlex.split("git secret init")
         init_regex = r" created.\ncleaning up...\n$"
@@ -65,16 +78,8 @@ class GitSecret():
 
     def whoknows(self) -> list:
         whoknows_command = shlex.split("git secret whoknows")
-        output = subprocess.run(args=whoknows_command, capture_output=True, cwd=self.repo_path)
-        users: list = []
 
-        if output.returncode == 0:
-            users = [n for n in output.stdout.decode("utf-8").split("\n") if n]
-        else:
-            raise GitSecretException("Error getting list of user with access to secrets.  stdout: %s; stderr: %s" %
-                                     (output.stdout.decode("utf-8"), output.stderr.decode("utf-8")))
-
-        return users
+        return self._command_and_split(whoknows_command)
 
     def killperson(self, email: str) -> None:
         killperson_command = shlex.split("git secret killperson")
@@ -83,4 +88,63 @@ class GitSecret():
 
         self._command_and_parse(killperson_command, killperson_regex)
 
-        # Add in re-hiding here.
+    def add(self, filename: str, autoadd: bool = False) -> None:
+        istracked_command = shlex.split("git ls-files")
+
+        add_command = shlex.split("git secret add")
+        add_regex = r" item(s) added."
+
+        if not autoadd:
+            files = self._command_and_split(istracked_command)
+            file_check = [n for n in files if filename in files]
+
+            if file_check:
+                raise GitSecretException("File isn't ignored via .gitignore and cannot be added to git secret!")
+        else:
+            add_command.append("-i")
+
+        add_command.append(filename)
+
+        self._command_and_parse(add_command, add_regex)
+
+    def hide(self, clean_encrypted: bool = False, clean_unencrypted: bool = False) -> None:
+        hide_command = shlex.split("git secret hide")
+        hide_regex = r"done. all [0-1]+ files are hidden."
+
+        if clean_encrypted:
+            hide_command.append("-c")
+
+        if clean_unencrypted:
+            hide_command.append("-d")
+
+        self._command_and_parse(hide_command, hide_regex)
+
+    def reveal(self, password: str, overwrite: bool = False, gpg_path: Optional[str] = None) -> None:
+        reveal_command = shlex.split("git secret reveal")
+        reveal_regex = r"done. all [0-1]+ files are revealed."
+
+        reveal_command.extend(["-p", password])
+
+        if overwrite:
+            reveal_command.append("-f")
+
+        if gpg_path:
+            reveal_command.extend(["-d", gpg_path])
+
+        self._command_and_parse(reveal_command, reveal_regex)
+
+    def remove(self, filename: str, delete_existing: bool = False):
+        remove_command = shlex.split("git secret remove")
+        remove_regex = r"ensure that files: \[.+\] are now not ignored."
+
+        if delete_existing:
+            remove_command.append("-c")
+
+        remove_command.append(filename)
+
+        self._command_and_parse(remove_command, remove_regex)
+
+    def clean(self) -> list:
+        clean_command = shlex.split("git secret clean -v")
+
+        return self._command_and_split(clean_command)[1:]
