@@ -25,7 +25,7 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "Topic :: Software Development :: Version Control :: Git".
+        "Topic :: Software Development :: Version Control :: Git",
         "Topic :: Security",
         "Topic :: Security :: Cryptography",
         "License :: OSI Approved :: MIT License",
