@@ -120,3 +120,17 @@ class GitSecret():
             hide_command.append("-d")
 
         self._command_and_parse(hide_command, hide_regex)
+
+    def reveal(self, password: str, overwrite: bool = False, gpg_path: Optional[str] = None) -> None:
+        reveal_command = shlex.split("git secret reveal")
+        reveal_regex = r"done. all [0-1]+ files are revealed."
+
+        reveal_command.extend(["-p", password])
+
+        if overwrite:
+            reveal_command.append("-f")
+
+        if gpg_path:
+            reveal_command.extend(["-d", gpg_path])
+
+        self._command_and_parse(reveal_command, reveal_regex)

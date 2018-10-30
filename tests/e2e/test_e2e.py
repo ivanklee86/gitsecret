@@ -42,7 +42,7 @@ def test_gitsecret_user_management(gen_gitsecret):
 def test_gitsecret_files(gen_gitsecret):
     gitsecret = gen_gitsecret
     gitsecret.create()
-    gitsecret.tell()
+    gitsecret.tell(email="test@test.com")
     assert len(gitsecret.whoknows()) == 1
     with open(os.path.join(PATH, "hello.txt"), "w+") as test_file:
         test_file.write("Hello!")
@@ -50,3 +50,4 @@ def test_gitsecret_files(gen_gitsecret):
         test_file.write("hello.txt")
     gitsecret.add("hello.txt")
     gitsecret.hide()
+    gitsecret.reveal("test")
