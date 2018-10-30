@@ -22,7 +22,7 @@ def gen_gitsecret():
     yield GitSecret(PATH)
 
     # Clear files at end.
-    shutil.rmtree(PATH)
+    # shutil.rmtree(PATH)
 
 
 def test_gitsecret_invalid_repo(gen_gitsecret):
@@ -34,9 +34,9 @@ def test_gitsecret_invalid_repo(gen_gitsecret):
 def test_gitsecret_user_management(gen_gitsecret):
     gitsecret = gen_gitsecret
     gitsecret.create()
-    gitsecret.tell()
+    gitsecret.tell(email="test@test.com")
     assert len(gitsecret.whoknows()) == 1
-    gitsecret.killperson(gitsecret.whoknows()[0])
+    gitsecret.killperson(email="test@test.com")
 
 
 def test_gitsecret_files(gen_gitsecret):
@@ -51,3 +51,5 @@ def test_gitsecret_files(gen_gitsecret):
     gitsecret.add("hello.txt")
     gitsecret.hide()
     gitsecret.reveal("test")
+    # gitsecret.remove("hello.txt")
+    assert len(gitsecret.clean()) == 1

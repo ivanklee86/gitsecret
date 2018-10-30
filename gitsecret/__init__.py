@@ -88,8 +88,6 @@ class GitSecret():
 
         self._command_and_parse(killperson_command, killperson_regex)
 
-        # Todo: Add in re-hiding here.
-
     def add(self, filename: str, autoadd: bool = False) -> None:
         istracked_command = shlex.split("git ls-files")
 
@@ -134,3 +132,19 @@ class GitSecret():
             reveal_command.extend(["-d", gpg_path])
 
         self._command_and_parse(reveal_command, reveal_regex)
+
+    def remove(self, filename: str, delete_existing: bool = False):
+        remove_command = shlex.split("git secret remove")
+        remove_regex = r"ensure that files: \[.+\] are now not ignored."
+
+        if delete_existing:
+            remove_command.append("-c")
+
+        remove_command.append(filename)
+
+        self._command_and_parse(remove_command, remove_regex)
+
+    def clean(self) -> list:
+        clean_command = shlex.split("git secret clean -v")
+
+        return self._command_and_split(clean_command)[1:]
