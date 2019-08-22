@@ -18,8 +18,11 @@ jobs:
           name: Run tests.
           command: pipenv run py.test --junitxml=pytest/results.xml --cov=gitsecret tests/unit
       - run:
-          name: Lint code.
+          name: pylint
           command: pipenv run pylint gitsecret -f parseable >> pylint.log
+      - run:
+          name: flake8
+          command: pipenv run flake8 >> flake8.log
       - run:
           name: Run mypy
           command: pipenv run mypy gitsecret >> mypy.log

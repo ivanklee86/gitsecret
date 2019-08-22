@@ -5,12 +5,13 @@ name = "pypi"
 
 [packages]
 gitpython = "*"
+gitsecret = {editable = true,path = "."}
 
 [dev-packages]
 # Pytest
 pytest = "*"
 pytest-cov  = "*"
-pytest-flake8 = "*"
+flake8 = "==3.6.0"
 pytest-html  = "*"
 pytest-runner  = "*"
 pytest-rerunfailures  = "*"
