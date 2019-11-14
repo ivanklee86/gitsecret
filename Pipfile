@@ -11,7 +11,7 @@ gitsecret = {editable = true,path = "."}
 # Pytest
 pytest = "*"
 pytest-cov  = "*"
-flake8 = "==3.7.8"
+flake8 = "==3.7.9"
 pytest-html  = "*"
 pytest-runner  = "*"
 pytest-rerunfailures  = "*"
