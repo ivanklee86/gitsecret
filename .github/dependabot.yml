@@ -1,0 +1,38 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "10:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: pylint
+    versions:
+    - 2.6.0
+    - 2.7.0
+    - 2.7.2
+    - 2.7.4
+  - dependency-name: gitpython
+    versions:
+    - 3.1.12
+    - 3.1.13
+  - dependency-name: pytest
+    versions:
+    - 6.2.1
+    - 6.2.2
+  - dependency-name: mypy
+    versions:
+    - "0.800"
+  - dependency-name: coveralls
+    versions:
+    - 3.0.0
+  - dependency-name: pytest-mock
+    versions:
+    - 3.5.1
+  - dependency-name: twine
+    versions:
+    - 3.3.0
+  - dependency-name: bleach
+    versions:
+    - 3.1.4
